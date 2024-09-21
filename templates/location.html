@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stardust</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDP7b0pFz-yQP2aRq-AGPm2EXvjHpFruR8&libraries=places"></script>
+  <script>
+    function initMap() {
+      let map;
+
+      // Initialize the map with a default center
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 10.8505, lng: 76.2711 }, // Default to Kochi
+        zoom: 12
+      });
+
+      const locationInput = document.querySelector('.location-input input');
+
+      locationInput.addEventListener('input', function() {
+        const locationValue = locationInput.value.trim();
+        if (locationValue) {
+          const coordinates = locationValue.split(',');
+          if (coordinates.length === 2) {
+            const userLatitude = parseFloat(coordinates[0]);
+            const userLongitude = parseFloat(coordinates[1]);
+
+            // Clear existing markers
+            if (map.markers) {
+              map.markers.forEach(marker => marker.setMap(null));
+              map.markers = [];
+            }
+
+            // Generate 5 random nearby points
+            const markers = [];
+            for (let i = 0; i < 5; i++) {
+              const offsetLat = (Math.random() - 0.5) * 0.1; // Random offset for latitude
+              const offsetLng = (Math.random() - 0.5) * 0.1; // Random offset for longitude
+              const markerLat = userLatitude + offsetLat;
+              const markerLng = userLongitude + offsetLng;
+
+              const marker = new google.maps.Marker({
+                position: { lat: markerLat, lng: markerLng },
+                map: map,
+                title: `Marker ${i + 1}`
+              });
+              markers.push(marker);
+            }
+
+            // Center map on the user location
+            map.setCenter({ lat: userLatitude, lng: userLongitude });
+
+            // Store markers to remove them later
+            map.markers = markers;
+          } else {
+            alert('Please enter a valid location in the format: latitude,longitude');
+          }
+        }
+      });
+    }
+  </script>
+</head>
+<body onload="initMap()">
+  <header class="header">
+    <img src="/static/logo.png" alt="Stardust Logo" class="logo">
+    <div class="location-input">
+      <span class="location-icon"></span>
+      <input type="text" placeholder="Enter your location (latitude,longitude)">
+    </div>
+  </header>
+
+  <div id="map" style="height: 500px; width: 100%;"></div>
+</body>
+</html>
